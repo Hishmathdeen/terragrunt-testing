@@ -1,36 +1,46 @@
-# This is a basic workflow to help you get started with Actions
+name: Terragrunt Plan PR Comment
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches:
+    - main
+    types: [ opened, synchronize, reopened ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  terragrunt-plan:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+    - name: Code Check out
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+    - name: Setup Terraform
+      id: setup-tf
+      uses: hashicorp/setup-terraform@v3
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+    - name: Terragrunt Setup
+      run: |
+        curl -LO https://github.com/gruntwork-io/terragrunt/releases/download/v0.72.5/terragrunt_linux_amd64
+        chmod +x terragrunt_linux_amd64
+        sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+        terragrunt --version
+
+    - name: Get changed files
+      id: changed-files
+      run: |
+        if ${{ github.event_name == 'pull_request' }}; then
+            echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+        else
+            echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+        fi
+    - name: List changed files
+      run: |
+        for file in ${{ steps.changed-files.outputs.changed_files }}; do
+            terragrunt-dir=$(dirname "$file")
+            cd $terragrunt-dir
+            terragrunt init
+            terragrunt plan -out $(pwd)/plan.tfplan
+            terragrunt show plan.tfplan | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[0-9:.]* STDOUT terraform: //' > plan.txt
+            cat plan.txt
+        done
