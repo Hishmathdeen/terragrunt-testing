@@ -38,7 +38,9 @@ jobs:
       run: |
         for file in ${{ steps.changed-files.outputs.changed_files }}; do
             terragrunt-dir=$(dirname "$file")
+            echo "$terragrunt-dir"
             cd /home/runner/work/terragrunt-testing/terragrunt-testing
+            ls
             cd $terragrunt-dir
             terragrunt init
             terragrunt plan -out $(pwd)/plan.tfplan
