@@ -46,5 +46,6 @@ jobs:
             terragrunt plan -out $(pwd)/plan.tfplan
             terragrunt show plan.tfplan | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[0-9:.]* STDOUT terraform: //' > plan.txt
             cat plan.txt
+            cd /home/runner/work/terragrunt-testing/terragrunt-testing
             python .github/workflows/main.py
         done
