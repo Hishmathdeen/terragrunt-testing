@@ -13,7 +13,7 @@ jobs:
     - name: Code Check out
       uses: actions/checkout@v3
       with:
-        fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+        fetch-depth: 2
 
     - name: Setup Terraform
       id: setup-tf
@@ -32,9 +32,9 @@ jobs:
         if ${{ github.event_name == 'pull_request' }}; then
             echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
         else
-            echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+            echo "Not a Pull Request"
         fi
-    - name: List changed files
+    - name: List changed files && Comment the Plan in PR
       env:
         GT_TOKEN: ${{ secrets.GT_TOKEN }}
         PR_NUMBER: ${{ github.event.pull_request.number }}

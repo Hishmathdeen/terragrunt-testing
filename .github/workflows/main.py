@@ -12,7 +12,7 @@ with open(file_path, 'r') as file:
     file_data = file.read()
 
 comment = f"""
-### :rocket: Infrasturece Change requtested
+### :rocket: Infrastructure Change requtested
 :memo: Terragrant File updated in `{dir_path}`
 
 ---
@@ -31,7 +31,7 @@ comment = f"""
 
 ---
 
-:checkered_flag: Review and Merge the PR
+:checkered_flag: Review and Merge the PR to Apply the Changes...
 
 """
 
