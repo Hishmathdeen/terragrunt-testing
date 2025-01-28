@@ -43,6 +43,7 @@ jobs:
             echo "Current working directory: $(pwd)"
             dir=$(dirname "$file")
             echo "$dir"
+            echo "DIR=$dir" >> $GITHUB_ENV
             cd /home/runner/work/terragrunt-testing/terragrunt-testing
             mkdir plans
             cd "$dir"
