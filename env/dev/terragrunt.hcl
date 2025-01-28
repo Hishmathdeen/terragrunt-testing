@@ -3,6 +3,6 @@ terraform {
 }
 
 inputs = {
-  content  = "dev content"
+  content  = "dev content update for pr"
   filename = "dev"
 }
