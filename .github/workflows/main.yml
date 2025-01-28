@@ -37,11 +37,12 @@ jobs:
     - name: List changed files
       run: |
         for file in ${{ steps.changed-files.outputs.changed_files }}; do
+            echo "Current working directory: $(pwd)"
             terragrunt-dir=$(dirname "$file")
             echo "$terragrunt-dir"
             cd /home/runner/work/terragrunt-testing/terragrunt-testing
             ls
-            cd $terragrunt-dir
+            cd "$terragrunt-dir"
             terragrunt init
             terragrunt plan -out $(pwd)/plan.tfplan
             terragrunt show plan.tfplan | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[0-9:.]* STDOUT terraform: //' > plan.txt
