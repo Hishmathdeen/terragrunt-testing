@@ -2,7 +2,7 @@ import requests
 import os
 
 owner = 'hishmathdeen'
-repo = 'demo-terra-atlantis'
+repo = 'terragrunt-testing'
 pr_number = os.getenv('PR_NUMBER')
 token = os.getenv('GT_TOKEN')
 dir_path = os.getenv('DIR')
