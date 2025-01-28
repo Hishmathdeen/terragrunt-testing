@@ -22,7 +22,7 @@ comment = f"""
 <details>
   <summary>Terragrunt Plan</summary>
 
-  Here is the data from the text file:
+  Plan:
 
   ```txt
   {file_data}
