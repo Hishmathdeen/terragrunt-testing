@@ -11,7 +11,7 @@ token = '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'
 # The comment you want to post
 # comment = 'This is a comment from the API.'
 
-file_path = 'plan.txt'
+file_path = '/home/runner/work/terragrunt-testing/terragrunt-testing/plans/plan.txt'
 with open(file_path, 'r') as file:
     file_data = file.read()
 
