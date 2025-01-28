@@ -1,15 +1,10 @@
 import requests
+import os
 
-# Replace with your GitHub repository details
-owner = 'hishmathdeen'  # GitHub username or organization
-repo = 'demo-terra-atlantis'  # GitHub repository name
-pr_number = 3  # PR number (e.g., 1 for PR #1)
-
-# Personal access token (PAT) with necessary permissions
-token = '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'
-
-# The comment you want to post
-# comment = 'This is a comment from the API.'
+owner = 'hishmathdeen'
+repo = 'demo-terra-atlantis'
+pr_number = os.getenv('PR_NUMBER')
+token = os.getenv('GT_TOKEN')
 
 file_path = '/home/runner/work/terragrunt-testing/terragrunt-testing/plans/plan.txt'
 with open(file_path, 'r') as file:
