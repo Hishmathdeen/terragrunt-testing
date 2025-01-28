@@ -38,8 +38,8 @@ jobs:
       run: |
         for file in ${{ steps.changed-files.outputs.changed_files }}; do
             echo "Current working directory: $(pwd)"
-            terragrunt-dir=$(dirname "$file")
-            echo "$terragrunt-dir"
+            dir=$(dirname "$file")
+            echo "dir"
             cd /home/runner/work/terragrunt-testing/terragrunt-testing
             ls
             cd "$terragrunt-dir"
