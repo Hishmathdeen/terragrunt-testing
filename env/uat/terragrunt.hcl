@@ -3,6 +3,6 @@ terraform {
 }
 
 inputs = {
-  content  = "uat content"
+  content  = "uat content test pr runwan"
   filename = "uat"
 }
