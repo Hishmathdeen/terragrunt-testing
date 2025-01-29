@@ -12,12 +12,12 @@ with open(file_path, 'r') as file:
     file_data = file.read()
 
 comment = f"""
-### :rocket: Infrastructure Change requtested
-:memo: Terragrant File updated in `{dir_path}`
+### :hammer_and_wrench: Infrastructure Change requtested
+:file_folder: Terragrant File updated in `{dir_path}`
 
 ---
 
-### :bulb: View the Plan
+### :memo: View the Plan
 
 <details>
   <summary>Terragrunt Plan</summary>
