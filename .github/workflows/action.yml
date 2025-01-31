@@ -25,6 +25,7 @@ jobs:
           else
             echo "Not a Pull Request"
             echo "changed_files=[]" >> $GITHUB_OUTPUT
+          fi
 
   process-changed-files:
     needs: get-changed-files
