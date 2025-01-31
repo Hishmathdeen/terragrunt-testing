@@ -3,8 +3,8 @@ name: Terragrunt Plan PR Comment
 on:
   pull_request:
     branches:
-      - main
-    types: [opened, synchronize, reopened]
+    - main
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   get-changed-files:
@@ -12,28 +12,77 @@ jobs:
     outputs:
       changed_files: ${{ steps.changed-files.outputs.changed_files }}
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
 
-      - name: Get changed files
-        id: changed-files
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            changed_files=$(git diff --name-only -r HEAD^1 HEAD | jq -R -s -c 'split("\n") | map(select(length > 0))')
-            echo "changed_files=$changed_files" >> $GITHUB_OUTPUT
-          else
-            echo "Not a Pull Request"
-            echo "changed_files=[]" >> $GITHUB_OUTPUT
-          fi
+    - name: Get changed files
+      id: changed-files
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          changed_files=$(git diff --name-only -r HEAD^1 HEAD | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "changed_files=$changed_files" >> $GITHUB_OUTPUT
+        else
+          echo "Not a Pull Request"
+          echo "changed_files=[]" >> $GITHUB_OUTPUT
+        fi
 
   process-changed-files:
     needs: get-changed-files
     runs-on: ubuntu-latest
+    env:
+      tf_version: 'latest'
+      tg_version: 'latest'
+      tf_working_dir: '.'
     strategy:
       matrix:
         file: ${{ fromJson(needs.get-changed-files.outputs.changed_files) }}
     steps:
-      - name: Print file
-        run: |
-          echo "Processing file: ${{ matrix.file }}"
+    - name: Print file
+      run: |
+        echo "Processing file: ${{ matrix.file }}"
+
+    - name: 'Checkout'
+      uses: actions/checkout@master
+    - name: 'Terragrunt Format'
+      uses: the-commons-project/terragrunt-github-actions@master
+      with:
+        tf_actions_version: ${{ env.tf_version }}
+        tg_actions_version: ${{ env.tg_version }}
+        tf_actions_binary: 'terraform'
+        tf_actions_subcommand: 'fmt'
+        tf_actions_working_dir: ${{ env.tf_working_dir }}
+        tf_actions_comment: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: 'Terragrunt Init'
+      uses: the-commons-project/terragrunt-github-actions@master
+      with:
+        tf_actions_version: ${{ env.tf_version }}
+        tg_actions_version: ${{ env.tg_version }}
+        tf_actions_subcommand: 'init'
+        tf_actions_working_dir: ${{ env.tf_working_dir }}
+        tf_actions_comment: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: 'Terragrunt Validate'
+      uses: the-commons-project/terragrunt-github-actions@master
+      with:
+        tf_actions_version: ${{ env.tf_version }}
+        tg_actions_version: ${{ env.tg_version }}
+        tf_actions_binary: 'terraform'
+        tf_actions_subcommand: 'validate'
+        tf_actions_working_dir: ${{ env.tf_working_dir }}
+        tf_actions_comment: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: 'Terragrunt Plan'
+      uses: the-commons-project/terragrunt-github-actions@master
+      with:
+        tf_actions_version: ${{ env.tf_version }}
+        tg_actions_version: ${{ env.tg_version }}
+        tf_actions_subcommand: 'plan'
+        tf_actions_working_dir: ${{ env.tf_working_dir }}
+        tf_actions_comment: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
