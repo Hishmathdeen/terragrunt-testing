@@ -1,0 +1,22 @@
+name: Send PR Details
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send PR details via POST request
+        run: |
+          curl -X POST "https://prod-33.southeastasia.logic.azure.com:443/workflows/b47379540861487caef9c45861215bed/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kJXH5Ir3Nbl81RvYbVsqqwkCngdDOULZw3GWC3qTeZs" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "title": "${{ github.event.pull_request.title }}",
+              "user": "${{ github.event.pull_request.user.login }}",
+              "base_branch": "${{ github.event.pull_request.base.ref }}",
+              "source_branch": "${{ github.event.pull_request.head.ref }}",
+              "pr_url": "${{ github.event.pull_request.html_url }}",
+              "requested_reviewers": "${{ toJSON(github.event.pull_request.requested_reviewers) }}"
+            }'
