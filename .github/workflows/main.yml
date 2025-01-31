@@ -54,4 +54,5 @@ jobs:
             cat /home/runner/work/terragrunt-testing/terragrunt-testing/plans/plan.txt
             cd /home/runner/work/terragrunt-testing/terragrunt-testing
             python .github/workflows/main.py
+            rm -rf plans
         done
