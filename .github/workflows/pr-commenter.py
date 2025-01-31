@@ -12,17 +12,17 @@ with open(file_path, 'r') as file:
     file_data = file.read()
 
 comment = f"""
-### :rocket: Infrasturece Change requtested
-:memo: Terragrant File updated in `{dir_path}`
+### :hammer_and_wrench: Infrastructure Change requtested
+:file_folder: Terragrant File updated in `{dir_path}`
 
 ---
 
-### :bulb: View the Plan
+### :memo: View the Plan
 
 <details>
   <summary>Terragrunt Plan</summary>
 
-  Here is the data from the text file:
+  Plan:
 
   ```txt
   {file_data}
@@ -31,7 +31,7 @@ comment = f"""
 
 ---
 
-:checkered_flag: Review and Merge the PR
+:checkered_flag: Review and Merge the PR to Apply the Changes...
 
 """
 
