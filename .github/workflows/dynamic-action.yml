@@ -1,4 +1,4 @@
-name: Comment dynamic
+name: Terragrunt Plan PR Comment
 
 on:
   pull_request:
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment_list) }}
+        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment) }}
     steps:
       - name: Echo Environment
         run: |
