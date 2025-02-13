@@ -1,0 +1,53 @@
+name: Terragrunt Plan PR Comment
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  get-changed-terragrunt-files:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Get changed directories
+        id: changed-files
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            changed_dirs=$(git diff --name-only -r HEAD^1 HEAD | xargs -n1 dirname | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            echo "changed_files=$changed_dirs" >> $GITHUB_OUTPUT
+          else
+            echo "Not a Pull Request"
+            echo "changed_files=[]" >> $GITHUB_OUTPUT
+
+  dynamically-set-env:
+    needs: get-changed-terragrunt-files
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.get-changed-terragrunt-files.outputs.changed_files) }}
+    steps:
+      - name: Extract Environment
+        id: extract-env
+        run: |
+          # Extract environment from directory path
+          environment=$(echo ${{ matrix.directory }} | cut -d'/' -f2)
+          echo "Environment: $environment"
+          echo "environment=$environment" >> $GITHUB_OUTPUT
+
+  final-job:
+    needs: dynamically-set-env
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment_list) }}
+    steps:
+      - name: Echo Environment
+        run: |
+          echo "Processing environment: ${{ matrix.env }}"
