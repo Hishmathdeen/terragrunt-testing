@@ -20,7 +20,7 @@ jobs:
         id: changed-files
         run: |
           if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
-            changed_dirs=$(git diff --name-only -r HEAD^1 HEAD | xargs -n1 dirname | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            changed_dirs=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs -n1 dirname | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
             echo "changed_files=$changed_dirs" >> $GITHUB_OUTPUT
           else
             echo "Not a Pull Request"
@@ -42,31 +42,8 @@ jobs:
           environment=$(echo ${{ matrix.directory }} | cut -d'/' -f2)
           echo "Environment: $environment"
           echo "environment=$environment" >> $GITHUB_OUTPUT
-    outputs:
-      environment: ${{ steps.extract-env.outputs.environment }}
 
-  join-environments:
-    needs: dynamically-set-env
-    runs-on: ubuntu-latest
-    outputs:
-      environments: ${{ steps.join.outputs.environments }}
-    steps:
-      - name: Join environments into a JSON array
-        id: join
-        run: |
-          # Get all environment outputs from dynamically-set-env
-          environments=$(echo '${{ toJson(needs.dynamically-set-env.outputs) }}' | jq -r '[.[] | .environment] | unique | tojson')
-          echo "Environments: $environments"
-          echo "environments=$environments" >> $GITHUB_OUTPUT
-
-  final-job1:
-    needs: join-environments
-    runs-on: devops-runner-set
-    strategy:
-      matrix:
-        environment: ${{ fromJson(needs.join-environments.outputs.environments) }}
-    environment: ${{ matrix.environment }}  # Set the environment dynamically
-    steps:
-      - name: Echo Environment
-        run: |
-          echo "Processing ${{ matrix.environment }}"
+      - name: Call Reusable Workflow
+        uses: ./.github/workflows/reusable-workflow.yml
+        with:
+          environment: ${{ steps.extract-env.outputs.environment }}
