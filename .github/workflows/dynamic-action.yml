@@ -1,4 +1,4 @@
-name: Terragrunt Plan PR Comment
+name: Comment dynamic
 
 on:
   pull_request:
