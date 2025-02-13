@@ -34,20 +34,18 @@ jobs:
       matrix:
         directory: ${{ fromJson(needs.get-changed-terragrunt-files.outputs.changed_files) }}
     steps:
-      - name: Extract Environment
-        id: extract-env
+      - name: Set environment list
+        id: set-env-list
         run: |
-          # Extract environment from directory path
-          environment=$(echo ${{ matrix.directory }} | cut -d'/' -f2)
-          echo "Environment: $environment"
-          echo "environment=$environment" >> $GITHUB_OUTPUT
+          environment_list="[\"${{ matrix.directory }}\"]"
+          echo "environment_list=$environment_list" >> $GITHUB_OUTPUT
 
   final-job:
     needs: dynamically-set-env
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment) }}
+        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment_list) }}
     steps:
       - name: Echo Environment
         run: |
