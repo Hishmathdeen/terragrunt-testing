@@ -1,0 +1,21 @@
+name: Terraform Plan Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan for ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Print Environment
+        run: |
+          echo "Environment: ${{ inputs.environment }}"
