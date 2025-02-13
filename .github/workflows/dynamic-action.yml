@@ -19,12 +19,13 @@ jobs:
       - name: Get changed directories
         id: changed-files
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "pull_request" == "pull_request" ]; then
             changed_dirs=$(git diff --name-only -r HEAD^1 HEAD | xargs -n1 dirname | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
             echo "changed_files=$changed_dirs" >> $GITHUB_OUTPUT
           else
             echo "Not a Pull Request"
             echo "changed_files=[]" >> $GITHUB_OUTPUT
+          fi
 
   dynamically-set-env:
     needs: get-changed-terragrunt-files
