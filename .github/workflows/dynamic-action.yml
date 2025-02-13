@@ -55,7 +55,7 @@ jobs:
         id: join
         run: |
           # Get all environment outputs from dynamically-set-env
-          environments=$(echo '${{ toJson(needs.dynamically-set-env.outputs) }}' | jq -r 'to_entries | map(.value.environment) | unique | tojson')
+          environments=$(echo '${{ toJson(needs.dynamically-set-env.outputs) }}' | jq -r '[.[] | .environment] | unique | tojson')
           echo "Environments: $environments"
           echo "environments=$environments" >> $GITHUB_OUTPUT
 
@@ -70,4 +70,3 @@ jobs:
       - name: Echo Environment
         run: |
           echo "Processing ${{ matrix.environment }}"
-          echo "Using environment-specific secrets for ${{ matrix.environment }}"
