@@ -30,6 +30,7 @@ jobs:
   dynamically-set-env:
     needs: get-changed-terragrunt-files
     runs-on: ubuntu-latest
+    if: ${{ fromJson(needs.get-changed-terragrunt-files.outputs.changed_files) != '[]' }}
     strategy:
       matrix:
         directory: ${{ fromJson(needs.get-changed-terragrunt-files.outputs.changed_files) }}
@@ -40,14 +41,14 @@ jobs:
           # Extract environment from directory path
           environment=$(echo ${{ matrix.directory }} | cut -d'/' -f2)
           echo "Environment: $environment"
-          echo "environment=$environment" >> $GITHUB_ENV
-          
+          echo "environment=$environment" >> $GITHUB_OUTPUT
     outputs:
       environment: ${{ steps.extract-env.outputs.environment }}
 
   final-job1:
     needs: dynamically-set-env
     runs-on: ubuntu-latest
+    if: ${{ needs.dynamically-set-env.outputs.environment }}
     steps:
       - name: Echo Environment
         run: |
