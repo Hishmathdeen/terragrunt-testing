@@ -45,13 +45,29 @@ jobs:
     outputs:
       environment: ${{ steps.extract-env.outputs.environment }}
 
-  final-job1:
+  join-environments:
     needs: dynamically-set-env
     runs-on: ubuntu-latest
+    outputs:
+      environments: ${{ steps.join.outputs.environments }}
+    steps:
+      - name: Join environments into a JSON array
+        id: join
+        run: |
+          # Get all environment outputs from dynamically-set-env
+          environments=$(echo '${{ toJson(needs.dynamically-set-env.outputs) }}' | jq -r 'to_entries | map(.value.environment) | unique | tojson')
+          echo "Environments: $environments"
+          echo "environments=$environments" >> $GITHUB_OUTPUT
+
+  final-job1:
+    needs: join-environments
+    runs-on: devops-runner-set
     strategy:
       matrix:
-        environment: ${{ fromJson(needs.dynamically-set-env.outputs.environment) }}
+        environment: ${{ fromJson(needs.join-environments.outputs.environments) }}
+    environment: ${{ matrix.environment }}  # Set the environment dynamically
     steps:
       - name: Echo Environment
         run: |
           echo "Processing ${{ matrix.environment }}"
+          echo "Using environment-specific secrets for ${{ matrix.environment }}"
