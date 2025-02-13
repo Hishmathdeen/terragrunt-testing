@@ -1,4 +1,4 @@
-name: Comment XYZ
+name: Terragrunt abc
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
       - name: Get changed directories
         id: changed-files
         run: |
-          if [ "pull_request" == "pull_request" ]; then
+          if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             changed_dirs=$(git diff --name-only -r HEAD^1 HEAD | xargs -n1 dirname | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
             echo "changed_files=$changed_dirs" >> $GITHUB_OUTPUT
           else
@@ -40,17 +40,12 @@ jobs:
           # Extract environment from directory path
           environment=$(echo ${{ matrix.directory }} | cut -d'/' -f2)
           echo "Environment: $environment"
-          
-          # Output in JSON format
-          echo "{\"environment\": \"$environment\"}" >> $GITHUB_OUTPUT
+          echo "environment=$environment" >> $GITHUB_ENV
 
-  final-job:
+  final-job1:
     needs: dynamically-set-env
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment).environment }}
     steps:
       - name: Echo Environment
         run: |
-          echo "Processing environment: ${{ matrix.env }}"
+          echo "Processing $environment"
