@@ -1,4 +1,4 @@
-name: abc ref
+name: Comment XYZ
 
 on:
   pull_request:
@@ -34,18 +34,22 @@ jobs:
       matrix:
         directory: ${{ fromJson(needs.get-changed-terragrunt-files.outputs.changed_files) }}
     steps:
-      - name: Set environment list
-        id: set-env-list
+      - name: Extract Environment
+        id: extract-env
         run: |
-          environment_list="[\"${{ matrix.directory }}\"]"
-          echo "environment_list=$environment_list" >> $GITHUB_OUTPUT
+          # Extract environment from directory path
+          environment=$(echo ${{ matrix.directory }} | cut -d'/' -f2)
+          echo "Environment: $environment"
+          
+          # Output in JSON format
+          echo "{\"environment\": \"$environment\"}" >> $GITHUB_OUTPUT
 
   final-job:
     needs: dynamically-set-env
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment_list) }}
+        env: ${{ fromJson(needs.dynamically-set-env.outputs.environment).environment }}
     steps:
       - name: Echo Environment
         run: |
