@@ -48,8 +48,10 @@ jobs:
   final-job1:
     needs: dynamically-set-env
     runs-on: ubuntu-latest
-    if: ${{ needs.dynamically-set-env.outputs.environment }}
+    strategy:
+      matrix:
+        environment: ${{ fromJson(needs.dynamically-set-env.outputs.environment) }}
     steps:
       - name: Echo Environment
         run: |
-          echo "Processing ${{ needs.dynamically-set-env.outputs.environment }}"
+          echo "Processing ${{ matrix.environment }}"
