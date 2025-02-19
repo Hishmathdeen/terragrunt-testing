@@ -1,0 +1,18 @@
+name: Debug GitHub Event
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print Who am I
+        run: echo 'I am the workflow inside the folder'
+
+      - name: Print GitHub Event JSON
+        run: echo '${{ toJSON(github.event) }}'
