@@ -3,6 +3,6 @@ terraform {
 }
 
 inputs = {
-  content  = "uat content"
+  content  = "uat content ajc"
   filename = "uat"
 }
